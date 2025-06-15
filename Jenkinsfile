@@ -50,7 +50,7 @@ pipeline {
           bat '''
           if not exist logs mkdir logs
           go build -o log_simulator.exe log_simulator.go
-          powershell -Command "Start-Job { ./log_simulator.exe }"
+          powershell -Command "Start-Job { Start-Process -NoNewWindow -FilePath ./log_simulator.exe -WorkingDirectory . }"
           '''
         }
       }
