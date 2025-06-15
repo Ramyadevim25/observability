@@ -53,11 +53,15 @@ pipeline {
 
           echo 🚀 Starting log simulator container in background...
           docker rm -f log-simulator || exit 0
-          docker run -d --name log-simulator -v %cd%\\logs:/app/logs log-simulator
+          docker run -d --name log-simulator ^
+            -v %cd%\\logs:/app/logs ^
+            -v %cd%\\infra_output.json:/app/infra_output.json ^
+            log-simulator
           '''
         }
       }
     }
+
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
