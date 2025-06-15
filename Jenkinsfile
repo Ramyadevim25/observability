@@ -49,18 +49,16 @@ pipeline {
         dir('simulator') {
           bat '''
           if not exist logs mkdir logs
-
           echo 🔨 Building simulator...
           go build -o log_simulator.exe log_simulator.go
-
           echo 🚀 Starting log_simulator.exe in background...
-          powershell -Command "Start-Process -NoNewWindow -FilePath .\\log_simulator.exe -WorkingDirectory . -WindowStyle Hidden"
-
+          powershell -Command "Start-Process -NoNewWindow -FilePath .\\log_simulator.exe -WorkingDirectory ."
           timeout /t 3
           '''
         }
       }
     }
+
 
 
 
