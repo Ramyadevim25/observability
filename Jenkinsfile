@@ -51,7 +51,7 @@ pipeline {
           echo 🔨 Building log simulator Docker image...
           docker build -t log-simulator .
 
-          echo 🚀 Starting log simulator container in background...
+          echo 🚀 Starting log simulator container...
           docker rm -f log-simulator || exit 0
           docker run -d --name log-simulator ^
             -v %cd%\\logs:/app/logs ^
@@ -62,20 +62,14 @@ pipeline {
       }
     }
 
-
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
-          // 🔥 Remove existing network to prevent conflicts
           bat 'docker network rm observability_net || exit 0'
-
-          // Terraform deploy
           bat 'terraform init'
           bat 'terraform destroy -auto-approve || exit 0'
           bat 'terraform apply -auto-approve'
         }
-
-        // Wait for services (Elasticsearch, Kibana, etc.)
         sleep time: 30, unit: 'SECONDS'
       }
     }
@@ -84,7 +78,7 @@ pipeline {
       steps {
         echo "✅ Grafana: http://localhost:3000 (admin/admin)"
         echo "✅ Kibana: http://localhost:15601"
-        echo "✅ Logs Folder: simulator/logs/"
+        echo "✅ Log Folder: simulator/logs/"
       }
     }
   }

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -33,49 +32,37 @@ type LogEntry struct {
 }
 
 func main() {
-	outputFile := "infra_output.json" // ✅ Relative path for Jenkins
-
+	outputFile := "infra_output.json"
 	data, err := ioutil.ReadFile(outputFile)
 	if err != nil {
-		fmt.Printf("Error reading Terraform output: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Remove UTF-8 BOM if present
 	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
 
 	var tfOutput TerraformOutput
 	if err := json.Unmarshal(data, &tfOutput); err != nil {
-		fmt.Printf("Error parsing Terraform output JSON: %v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Printf("Parsed services: %+v\n", tfOutput.Services.Value)
 
 	for _, svc := range tfOutput.Services.Value {
 		go writeLogs(svc.Name, svc.Environment)
 	}
 
-	select {} // Block forever to keep goroutines alive
+	select {} // keep goroutines alive
 }
 
-func writeLogs(service string, environment string) {
-	logDir := "logs" // ✅ Relative path (Jenkins mounts it into Filebeat container)
+func writeLogs(service, environment string) {
+	logDir := "logs"
+	_ = os.MkdirAll(logDir, os.ModePerm)
 
-	err := os.MkdirAll(logDir, os.ModePerm)
-	if err != nil {
-		fmt.Printf("Error creating log directory: %v\n", err)
-		return
-	}
-
-	filePath := filepath.Join(logDir, fmt.Sprintf("%s.log", service))
+	filePath := filepath.Join(logDir, service+".log")
 	rand.Seed(time.Now().UnixNano())
 
 	for {
 		f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			fmt.Printf("Error opening log file: %v\n", err)
-			return
+			continue
 		}
 
 		// Random log level
@@ -94,15 +81,15 @@ func writeLogs(service string, environment string) {
 			Service:     service,
 			Timestamp:   time.Now().UTC().Format(time.RFC3339),
 			Level:       level,
-			Message:     fmt.Sprintf("Simulated %s log for %s service", level, service),
+			Message:     "Simulated " + level + " log for " + service + " service",
 			Component:   "core",
 			Environment: environment,
 		}
 
 		entryJSON, _ := json.Marshal(entry)
 		f.WriteString(string(entryJSON) + "\n")
-		f.Close() // ✅ Ensures every line is flushed
+		f.Close()
 
-		time.Sleep(5 * time.Second) // Delay between logs
+		time.Sleep(5 * time.Second)
 	}
 }
