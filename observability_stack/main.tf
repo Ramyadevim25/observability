@@ -9,10 +9,16 @@ terraform {
 
 provider "docker" {}
 
-# Create Docker network for observability stack
 resource "docker_network" "observability_net" {
   name = "observability_net"
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+    ignore_changes        = [name]
+  }
 }
+
 
 # Elasticsearch image & container
 resource "docker_image" "elasticsearch" {
