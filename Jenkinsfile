@@ -66,19 +66,18 @@ pipeline {
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
-
-          echo "🧹 Cleaning up old Docker network if it exists..."
+          // 🔥 Remove existing network to prevent conflicts
           bat 'docker network rm observability_net || exit 0'
 
-          echo "📦 Initializing and applying Terraform for observability stack..."
+          // Terraform deploy
           bat 'terraform init'
           bat 'terraform apply -auto-approve'
         }
 
+        // Wait for services (Elasticsearch, Kibana, etc.)
         sleep time: 30, unit: 'SECONDS'
       }
     }
-
 
     stage('Verify Observability Interfaces') {
       steps {
