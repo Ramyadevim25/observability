@@ -51,9 +51,8 @@ pipeline {
           REM ✅ Ensure logs folder exists
           if not exist logs mkdir logs
 
-          echo 🚀 Starting log_simulator.go as background job...
-
-          powershell -Command "Start-Job -ScriptBlock { cd '${PWD}'; go run log_simulator.go }"
+          echo 🚀 Starting log_simulator.go as detached background process...
+          start "" cmd /c "go run log_simulator.go"
 
           REM ✅ Wait briefly to ensure job starts
           timeout /t 3 > nul
@@ -61,7 +60,6 @@ pipeline {
         }
       }
     }
-
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
