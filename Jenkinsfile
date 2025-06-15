@@ -50,11 +50,12 @@ pipeline {
           bat '''
           if not exist logs mkdir logs
           go build -o log_simulator.exe log_simulator.go
-          start log_simulator.exe
+          powershell -Command "Start-Job { ./log_simulator.exe }"
           '''
         }
       }
     }
+
 
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
