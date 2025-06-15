@@ -49,11 +49,13 @@ pipeline {
         dir('simulator') {
           bat '''
           if not exist logs mkdir logs
-          start /B "" go run log_simulator.go
+          go build -o log_simulator.exe log_simulator.go
+          start log_simulator.exe
           '''
         }
       }
     }
+
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
