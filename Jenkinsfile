@@ -47,8 +47,11 @@ pipeline {
     stage('Start Log Simulator') {
       steps {
         dir('simulator') {
-          // Make sure Go is installed
-          bat 'nohup go run log_simulator.go > logs/simulator.log 2>&1 &'
+          // Ensure 'logs' directory exists BEFORE redirecting output
+          bat '''
+          if not exist logs mkdir logs
+          start /B go run log_simulator.go > logs\\simulator.log 2>&1
+          '''
         }
       }
     }
