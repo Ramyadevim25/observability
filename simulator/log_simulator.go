@@ -7,6 +7,7 @@ import (
     "io/ioutil"
     "math/rand"
     "os"
+    "path/filepath"
     "time"
 )
 
@@ -32,7 +33,7 @@ type LogEntry struct {
 }
 
 func main() {
-    outputFile := "C:/Users/HP/Downloads/Observability_project/simulator/infra_output.json"
+    outputFile := "infra_output.json" // ✅ Use relative path
 
     data, err := ioutil.ReadFile(outputFile)
     if err != nil {
@@ -58,14 +59,14 @@ func main() {
 }
 
 func writeLogs(service string, environment string) {
-    logDir := "C:/Users/HP/Downloads/Observability_project/simulator/logs"
+    logDir := "logs" // ✅ Use relative path
     err := os.MkdirAll(logDir, os.ModePerm)
     if err != nil {
         fmt.Printf("Error creating log directory: %v\n", err)
         return
     }
 
-    filePath := fmt.Sprintf("%s/%s.log", logDir, service)
+    filePath := filepath.Join(logDir, fmt.Sprintf("%s.log", service))
     f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
         fmt.Printf("Error opening log file: %v\n", err)
