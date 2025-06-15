@@ -102,13 +102,13 @@ resource "docker_container" "filebeat" {
   image = docker_image.filebeat.name
 
   volumes {
-    host_path      = "C:\\Users\\HP\\Downloads\\Observability_project\\observability_stack\\filebeat.yml"
-    container_path = "/usr/share/filebeat/filebeat.yml"
+    host_path      = abspath("${path.module}/../simulator/logs")
+    container_path = "/var/log/app"
   }
 
   volumes {
-    host_path      = "C:\\Users\\HP\\Downloads\\Observability_project\\simulator\\logs"
-    container_path = "/var/log/app"
+    host_path      = abspath("${path.module}/filebeat.yml")
+    container_path = "/usr/share/filebeat/filebeat.yml"
   }
 
   command = ["filebeat", "-e", "-strict.perms=false", "-c", "/usr/share/filebeat/filebeat.yml"]
