@@ -64,20 +64,20 @@ pipeline {
 
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
-  steps {
-    dir('observability_stack') {
+      steps {
+        dir('observability_stack') {
 
-      echo "🧹 Cleaning up old Docker network if it exists..."
-      bat 'docker network rm observability_net || exit 0'
+          echo "🧹 Cleaning up old Docker network if it exists..."
+          bat 'docker network rm observability_net || exit 0'
 
-      echo "📦 Initializing and applying Terraform for observability stack..."
-      bat 'terraform init'
-      bat 'terraform apply -auto-approve'
+          echo "📦 Initializing and applying Terraform for observability stack..."
+          bat 'terraform init'
+          bat 'terraform apply -auto-approve'
+        }
+
+        sleep time: 30, unit: 'SECONDS'
+      }
     }
-
-    sleep time: 30, unit: 'SECONDS'
-  }
-}
 
 
     stage('Verify Observability Interfaces') {
