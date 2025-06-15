@@ -53,15 +53,11 @@ pipeline {
           go build -o log_simulator.exe log_simulator.go
           echo 🚀 Starting log_simulator.exe in background...
           powershell -Command "Start-Process -NoNewWindow -FilePath .\\log_simulator.exe -WorkingDirectory ."
-          timeout /t 3
+          ping 127.0.0.1 -n 4 > nul
           '''
         }
       }
     }
-
-
-
-
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
