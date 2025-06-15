@@ -21,7 +21,7 @@ pipeline {
     stage('Start LocalStack') {
       steps {
         dir('Terraform_infra') {
-          sh 'docker-compose up -d'
+          bat 'docker-compose up -d'
         }
         sleep time: 20, unit: 'SECONDS'
       }
@@ -30,8 +30,8 @@ pipeline {
     stage('Terraform Init & Apply (Infra Only)') {
       steps {
         dir('Terraform_infra') {
-          sh 'terraform init'
-          sh 'terraform apply -auto-approve'
+          bat 'terraform init'
+          bat 'terraform apply -auto-approve'
         }
       }
     }
@@ -39,7 +39,7 @@ pipeline {
     stage('Export Terraform Output for Simulator') {
       steps {
         dir('Terraform_infra') {
-          sh 'terraform output -json > ../simulator/infra_output.json'
+          bat 'terraform output -json > ../simulator/infra_output.json'
         }
       }
     }
@@ -48,7 +48,7 @@ pipeline {
       steps {
         dir('simulator') {
           // Make sure Go is installed
-          sh 'nohup go run log_simulator.go > logs/simulator.log 2>&1 &'
+          bat 'nohup go run log_simulator.go > logs/simulator.log 2>&1 &'
         }
       }
     }
@@ -56,8 +56,8 @@ pipeline {
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
-          sh 'terraform init'
-          sh 'terraform apply -auto-approve'
+          bat 'terraform init'
+          bat 'terraform apply -auto-approve'
         }
         sleep time: 30, unit: 'SECONDS' // Wait for services to come online
       }
