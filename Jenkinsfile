@@ -47,11 +47,7 @@ pipeline {
     stage('Start Log Simulator') {
       steps {
         dir('simulator') {
-          // Ensure 'logs' directory exists BEFORE redirecting output
-          bat '''
-          if not exist logs mkdir logs
-          start /B go run log_simulator.go > logs\\simulator.log 2>&1
-          '''
+          bat 'start /B go run log_simulator.go'
         }
       }
     }
@@ -61,10 +57,7 @@ pipeline {
         dir('observability_stack') {
 
           // 🔥 Manually remove containers if already running (prevents image conflict errors)
-          bat '''
-          docker rm -f grafana kibana logstash filebeat elasticsearch || exit 0
-          docker network rm observability_net || exit 0
-          '''
+          bat 'docker network rm observability_net || exit 0'
 
           // Terraform deploy
           bat 'terraform init'
