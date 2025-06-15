@@ -1,0 +1,91 @@
+{
+  "title": "Service Logs Overview",
+  "refresh": "10s",
+  "schemaVersion": 36,
+  "version": 1,
+  "editable": true,
+  "timezone": "browser",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Service Log dashboard",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "date_histogram",
+              "field": "@timestamp",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0
+              }
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P31C819B24CF3C3C7"
+          }
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Error Count by Service",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "refId": "B",
+          "query": "level.keyword:ERROR",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "terms",
+              "field": "service.keyword",
+              "settings": {
+                "size": 10,
+                "order": "desc",
+                "orderBy": "_count"
+              }
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P31C819B24CF3C3C7"
+          }
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Warnings by Service",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 6 },
+      "targets": [{
+        "refId": "D",
+        "query": "level:WARNING",
+        "metrics": [{ "id": "1", "type": "count" }],
+        "bucketAggs": [{
+          "id": "2",
+          "type": "terms",
+          "field": "service.keyword",
+          "settings": {
+            "size": 10,
+            "order": "desc",
+            "orderBy": "_count"
+          }
+        }],
+        "datasource": { "type": "elasticsearch", "uid": "P31C819B24CF3C3C7" }
+      }]
+    }
+
+  ]
+}
