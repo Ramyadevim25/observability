@@ -44,26 +44,25 @@ pipeline {
       }
     }
 
-    stage('Start Log Simulator') {
+    stage('Start Log Simulator (Dockerized)') {
       steps {
         dir('simulator') {
           bat '''
-          if not exist logs mkdir logs
-          echo 🔨 Building simulator...
-          go build -o log_simulator.exe log_simulator.go
-          echo 🚀 Launching simulator in detached background...
-          start "" cmd /c "log_simulator.exe"
+          echo 🔨 Building log simulator Docker image...
+          docker build -t log-simulator .
+
+          echo 🚀 Starting log simulator container in background...
+          docker rm -f log-simulator || exit 0
+          docker run -d --name log-simulator -v %cd%\\logs:/app/logs log-simulator
           '''
         }
       }
     }
 
-
-
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
-          // 🔥 Manually remove containers if already running (prevents image conflict errors)
+          // 🔥 Remove existing network to prevent conflicts
           bat 'docker network rm observability_net || exit 0'
 
           // Terraform deploy
@@ -71,7 +70,7 @@ pipeline {
           bat 'terraform apply -auto-approve'
         }
 
-        // Give containers time to become available
+        // Wait for services (Elasticsearch, Kibana, etc.)
         sleep time: 30, unit: 'SECONDS'
       }
     }
@@ -80,7 +79,7 @@ pipeline {
       steps {
         echo "✅ Grafana: http://localhost:3000 (admin/admin)"
         echo "✅ Kibana: http://localhost:15601"
-        echo "✅ Log Files: simulator/logs/"
+        echo "✅ Logs Folder: simulator/logs/"
       }
     }
   }
