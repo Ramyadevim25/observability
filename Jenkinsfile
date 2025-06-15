@@ -54,12 +54,13 @@ pipeline {
           echo 🚀 Starting log_simulator.go as detached background process...
           start "" cmd /c "go run log_simulator.go"
 
-          REM ✅ Wait briefly to ensure job starts
-          timeout /t 3
+          REM ✅ Wait briefly using ping (safe alternative to timeout)
+          ping -n 4 127.0.0.1 > nul
           '''
         }
       }
     }
+
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
