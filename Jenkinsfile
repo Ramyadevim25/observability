@@ -51,12 +51,13 @@ pipeline {
           if not exist logs mkdir logs
           echo 🔨 Building simulator...
           go build -o log_simulator.exe log_simulator.go
-          echo 🚀 Starting log_simulator.exe in detached mode...
-          powershell -Command "Start-Process -FilePath .\\log_simulator.exe -WorkingDirectory . -WindowStyle Hidden"
+          echo 🚀 Starting log_simulator.exe as a detached process...
+          start "" log_simulator.exe
           '''
         }
       }
     }
+
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
