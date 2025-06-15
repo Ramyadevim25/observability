@@ -44,23 +44,24 @@ pipeline {
       }
     }
 
-    stage('Start Log Simulator (Dockerized)') {
+    stage('Start Log Simulator (Non-Dockerized & Persistent)') {
       steps {
         dir('simulator') {
           bat '''
-          echo 🔨 Building log simulator Docker image...
-          docker build -t log-simulator .
+          REM ✅ Ensure logs folder exists
+          if not exist logs mkdir logs
 
-          echo 🚀 Starting log simulator container...
-          docker rm -f log-simulator || exit 0
-          docker run -d --name log-simulator ^
-            -v %cd%\\logs:/app/logs ^
-            -v %cd%\\infra_output.json:/app/infra_output.json ^
-            log-simulator
+          echo 🚀 Starting log_simulator.go as background job...
+
+          powershell -Command "Start-Job -ScriptBlock { cd '${PWD}'; go run log_simulator.go }"
+
+          REM ✅ Wait briefly to ensure job starts
+          timeout /t 3 > nul
           '''
         }
       }
     }
+
 
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
