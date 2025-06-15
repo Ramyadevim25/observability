@@ -55,7 +55,7 @@ pipeline {
           start "" cmd /c "go run log_simulator.go"
 
           REM ✅ Wait briefly to ensure job starts
-          timeout /t 3 > nul
+          timeout /t 3
           '''
         }
       }
