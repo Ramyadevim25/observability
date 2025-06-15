@@ -59,19 +59,29 @@ pipeline {
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
+
+          // 🔥 Manually remove containers if already running (prevents image conflict errors)
+          bat '''
+          docker rm -f grafana kibana logstash filebeat elasticsearch || exit 0
+          docker network rm observability_net || exit 0
+          '''
+
+          // Terraform deploy
           bat 'terraform init'
           bat 'terraform destroy -auto-approve || exit 0'
           bat 'terraform apply -auto-approve'
         }
-        sleep time: 30, unit: 'SECONDS' // Wait for services to come online
+
+        // Give containers time to become available
+        sleep time: 30, unit: 'SECONDS'
       }
     }
 
     stage('Verify Observability Interfaces') {
       steps {
-        echo "Grafana: http://localhost:3000"
-        echo "Kibana: http://localhost:15601"
-        echo "Log files: simulator/logs/"
+        echo "✅ Grafana: http://localhost:3000 (admin/admin)"
+        echo "✅ Kibana: http://localhost:15601"
+        echo "✅ Log Files: simulator/logs/"
       }
     }
   }
