@@ -60,6 +60,7 @@ pipeline {
       steps {
         dir('observability_stack') {
           bat 'terraform init'
+          bat 'terraform destroy -auto-approve || exit 0'
           bat 'terraform apply -auto-approve'
         }
         sleep time: 30, unit: 'SECONDS' // Wait for services to come online
