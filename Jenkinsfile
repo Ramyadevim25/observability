@@ -61,7 +61,6 @@ pipeline {
 
           // Terraform deploy
           bat 'terraform init'
-          bat 'terraform destroy -auto-approve || exit 0'
           bat 'terraform apply -auto-approve'
         }
 
