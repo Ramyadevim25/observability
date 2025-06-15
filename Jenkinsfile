@@ -47,7 +47,10 @@ pipeline {
     stage('Start Log Simulator') {
       steps {
         dir('simulator') {
-          bat 'start /B go run log_simulator.go'
+          bat '''
+          if not exist logs mkdir logs
+          start /B "" go run log_simulator.go
+          '''
         }
       }
     }
