@@ -51,9 +51,8 @@ pipeline {
           if not exist logs mkdir logs
           echo 🔨 Building simulator...
           go build -o log_simulator.exe log_simulator.go
-          echo 🚀 Starting log_simulator.exe in background...
-          powershell -Command "Start-Process -NoNewWindow -FilePath .\\log_simulator.exe -WorkingDirectory ."
-          ping 127.0.0.1 -n 4 > nul
+          echo 🚀 Starting log_simulator.exe in detached mode...
+          powershell -Command "Start-Process -FilePath .\\log_simulator.exe -WorkingDirectory . -WindowStyle Hidden"
           '''
         }
       }
@@ -62,7 +61,6 @@ pipeline {
     stage('Deploy Observability Stack (Terraform + Docker)') {
       steps {
         dir('observability_stack') {
-
           // 🔥 Manually remove containers if already running (prevents image conflict errors)
           bat 'docker network rm observability_net || exit 0'
 
