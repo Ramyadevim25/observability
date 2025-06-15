@@ -14,7 +14,7 @@ pipeline {
 
     stage('Checkout Code') {
       steps {
-        git branch: 'main', url: 'https://github.com/YOUR_USERNAME/observability.git'
+        git branch: 'main', url: 'https://github.com/Ramyadevim25/observability.git'
       }
     }
 
